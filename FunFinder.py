@@ -2,6 +2,7 @@ import sys
 import os
 import re
 import subprocess
+from operator import itemgetter
 
 class FunFinder:
 
@@ -36,9 +37,10 @@ class FunFinder:
         #Get the wildcarded name parameter for UNIX find to use
         self.findTarget = '*'+'*'.join(allChars)+'*'
         
-        #Generate regex for results analysis and ranking
-        self.regexTarget = r'(?=('+".*?".join(allChars)+r'))'
-        
+        #Generate compiles regex for results analysis and ranking
+        self.regexTarget = re.compile(r'(?=('+".*?".join(allChars)+r'))',
+                                      re.DOTALL|re.IGNORECASE)
+
 
     #Parse an argument, setting flags, and so on
     def parse_argument(self, arg):
@@ -83,14 +85,36 @@ class FunFinder:
             findShellCall.append('-type')
             findShellCall.append('d')
         
-        findShellCall.append('-name')
+        findShellCall.append('-iname')
         findShellCall.append(self.findTarget)
 
         return findShellCall
 
 
+    #===== SORTING STUFF =====
+
+    def rank_results(self):
+        results = self.get_analyzed_results()
+        #sort by match len, then path len, then alphabet
+        self.sortedResults = sorted(results, key=lambda a:(len(a[1]), len(a[0]), a[0]))
 
 
+    def get_analyzed_results(self):  
 
+        #quick lil' get shortest match func
+        def shortest_match(string):
+            matches = self.regexTarget.findall(string)
+            return min(matches, key=len)
+
+        analyzedResults = [(r, shortest_match(r)) for r in self.findResults if r != ""]
+        return analyzedResults
+
+
+    #===== PRINTING STUFF =====
+        
+    def dump_results(self):
+        while(len(self.sortedResults)):
+            curResult = self.sortedResults.pop()
+            print curResult[0]
 
 

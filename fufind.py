@@ -10,8 +10,9 @@ def main(args):
     except OSError, e:
         print >>sys.stderr, "Execution failed:", e
 
-    print theFunFinder.findResults
-
+    theFunFinder.rank_results()
+    theFunFinder.dump_results()
+   
 #RUN IT
 main(sys.argv)
 
