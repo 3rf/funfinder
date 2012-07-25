@@ -47,13 +47,18 @@ class FunFinder:
 
         if(arg[0] == '-'):
             #we have a flag
-            if(arg == "--debug"):
-                self.DEBUG = True
-            elif(arg == "--root"):
-                self.useForceRoot = True
-            elif('d' in arg):
-                self.useDirOnly = True
-            
+            if('--' in arg):
+                if(arg == "--debug"):
+                    self.DEBUG = True
+                elif(arg == "--root"):
+                    self.useForceRoot = True
+            else:
+                if('d' in arg):
+                    self.useDirOnly = True
+                if('c' in arg):
+                    self.useColor = True
+                if('l' in arg):
+                    self.useFeelingLucky = True
         else:
             #we have a target
             self.target = arg
@@ -110,11 +115,46 @@ class FunFinder:
         return analyzedResults
 
 
-    #===== PRINTING STUFF =====
+    #===== PRINTING & GOTO STUFF =====
+
+    #helper function for colored highlighting
+    def get_color_substr(self, result):
+        colorANSI = "\x1B[32;40m"   #TODO make this a confid
+        colorStopANSI = "\x1B[0m"
+
+        subStart = result[0].find(result[1])
+        subEnd = subStart + len(result[1])
+        split = (result[0][:subStart],
+                 result[0][subStart: subEnd],
+                 result[0][subEnd:])
+        return split[0]+colorANSI+split[1]+colorStopANSI+split[2]
+
         
     def dump_results(self):
-        while(len(self.sortedResults)):
+
+        #quick helper for printing
+        def print_result(result):
+            if(self.useColor):
+                print self.get_color_substr(result)
+            else:
+                print result[0]
+
+        #only print best match if flag is on
+        if(self.useFeelingLucky):
+            print_result(self.sortedResults[0])
+            return
+            
+        #else print all from worst to best
+        while(len(self.sortedResults) > 0):
             curResult = self.sortedResults.pop()
-            print curResult[0]
+            print_result(curResult)
+
+
+    def goto_directory(self):
+        callParams = ['cd', self.sortedResults[0]]
+        findResultsRaw = subprocess.call(callParams)
+
+
+
 
 
