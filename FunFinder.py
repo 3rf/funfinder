@@ -19,6 +19,7 @@ class FunFinder:
         self.useDirOnly = False         #only find directories
         self.useFeelingLucky = False    #only return the best result
         self.useForceRoot = False       #start find from '/'
+        self.useForceHome = False       #start find from '~/'
 
         for arg in argList:
             self.parse_argument(arg)
@@ -52,6 +53,11 @@ class FunFinder:
                     self.DEBUG = True
                 elif(arg == "--root"):
                     self.useForceRoot = True
+                elif(arg == "--home"):
+                    self.useForceHome = True
+                elif(arg == "--goto"):
+                    self.useFeelingLucky = True
+                    self.useDirOnly = True
             else:
                 if('d' in arg):
                     self.useDirOnly = True
@@ -83,6 +89,8 @@ class FunFinder:
         #check find flags
         if(self.useForceRoot):
             findShellCall.append('/')
+        elif(self.useForceHome):
+            findShellCall.append('~/')
         else:
             findShellCall.append('.')
 
@@ -115,7 +123,7 @@ class FunFinder:
         return analyzedResults
 
 
-    #===== PRINTING & GOTO STUFF =====
+    #===== PRINTING STUFF =====
 
     #helper function for colored highlighting
     def get_color_substr(self, result):
@@ -148,13 +156,5 @@ class FunFinder:
         while(len(self.sortedResults) > 0):
             curResult = self.sortedResults.pop()
             print_result(curResult)
-
-
-    def goto_directory(self):
-        callParams = ['cd', self.sortedResults[0]]
-        findResultsRaw = subprocess.call(callParams)
-
-
-
 
 

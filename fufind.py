@@ -7,11 +7,12 @@ def main(args):
     
     try:
         theFunFinder.run_unix_find()
+        theFunFinder.rank_results()
+        theFunFinder.dump_results()
+
     except OSError, e:
         print >>sys.stderr, "Execution failed:", e
-
-    theFunFinder.rank_results()
-    theFunFinder.dump_results()
+        exit(1)
    
 #RUN IT
 main(sys.argv)
