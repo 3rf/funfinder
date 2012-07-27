@@ -5,7 +5,7 @@ echo "Copying executable to /usr/bin/    (requires root access) "
 #TODO: support older versions, add a choice here
 
 sudo cp funfind_2_7.py /usr/bin/funfind
-if [ $? -eq 0 ];
+if [ $? -ne 0 ];
 then
     exit
 fi
