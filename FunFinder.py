@@ -2,7 +2,6 @@ import sys
 import os
 import re
 import subprocess
-from operator import itemgetter
 
 class FunFinder:
 
@@ -14,6 +13,7 @@ class FunFinder:
         #Initialize our members
         self.target = ''
         self.DEBUG = False
+        self.usePath = False            #use -ipath instead of -iname
         self.useGoto = False            #cd to best matching directory
         self.useColor = False           #color the output
         self.useDirOnly = False         #only find directories
@@ -63,6 +63,8 @@ class FunFinder:
                     self.useDirOnly = True
                 if('c' in arg):
                     self.useColor = True
+                if('p' in arg):
+                    self.usePath = True
                 if('l' in arg):
                     self.useFeelingLucky = True
         else:
@@ -98,7 +100,10 @@ class FunFinder:
             findShellCall.append('-type')
             findShellCall.append('d')
         
-        findShellCall.append('-iname')
+        if(self.usePath):
+            findShellCall.append('-ipath')
+        else:
+            findShellCall.append('-iname')
         findShellCall.append(self.findTarget)
 
         return findShellCall
@@ -149,7 +154,8 @@ class FunFinder:
 
         #only print best match if flag is on
         if(self.useFeelingLucky):
-            print_result(self.sortedResults[0])
+            if(len(self.sortedResults) > 0):
+                print_result(self.sortedResults[0])
             return
             
         #else print all from worst to best
